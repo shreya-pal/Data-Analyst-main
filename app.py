@@ -21,7 +21,6 @@ from io import BytesIO
 from typing import Dict, Any, List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
@@ -116,16 +115,6 @@ class LLMWithFallback:
 
 
 LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", 240))
-
-
-@app.get("/", response_class=HTMLResponse)
-async def serve_frontend():
-    """Serve the main HTML interface"""
-    try:
-        with open("index.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>Frontend not found</h1><p>Please ensure index.html is in the same directory as app.py</p>", status_code=404)
 
 
 def parse_keys_and_types(raw_questions: str):
@@ -762,16 +751,6 @@ _FAVICON_FALLBACK_PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO3n+9QAAAAASUVORK5CYII="
 )
 
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    """
-    Serve favicon.ico if present in the working directory.
-    Otherwise return a tiny transparent PNG to avoid 404s.
-    """
-    path = "favicon.ico"
-    if os.path.exists(path):
-        return FileResponse(path, media_type="image/x-icon")
-    return Response(content=_FAVICON_FALLBACK_PNG, media_type="image/png")
 
 @app.get("/api", include_in_schema=False)
 async def analyze_get_info():
@@ -803,7 +782,7 @@ import tempfile
 import os
 import time 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse, HTMLResponse    
+from fastapi.responses import JSONResponse    
 
 # ---- Configuration for diagnostics (tweak as needed) ----
 DIAG_NETWORK_TARGETS = {
